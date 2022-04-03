@@ -78,7 +78,7 @@ void error(const char* msg)
  * @param fileName Filnavn incl. evt. stinavn
  * @return Kun filnavn
  */
-const char* extractFileName(const char* fileName)
+char* extractFileName(const char* fileName)
 {
     char* ecn;
     return ((ecn = (char *)strrchr(fileName,'/'))==0 ? fileName : ++ecn);
