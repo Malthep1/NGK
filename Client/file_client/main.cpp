@@ -25,6 +25,8 @@ void receiveFile(string fileName, int socketfd);
 
 int main(int argc, char *argv[])
 {
+	printf("Input path of file to request from server:\n");
+	
 	// TO DO Your own code
 }
 

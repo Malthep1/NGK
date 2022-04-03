@@ -3,7 +3,6 @@
 
 #define PORT 9000
 #define BUFSIZE 1000
-
 #ifdef __cplusplus
     extern "C" {
 #endif
