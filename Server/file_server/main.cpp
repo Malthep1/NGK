@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <cmath>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,7 +22,8 @@ static char readBuf[BUFSIZE];
 static char writeBuf[BUFSIZE];
 struct sockaddr_in serv_addr, cli_addr;
 
-void sendFile(string fileName, long fileSize, int outToClient);
+
+void sendFile(const char* fileName, long fileSize, int outToClient);
 
 /**
  * main starter serveren og venter på en forbindelse fra en klient
@@ -63,21 +65,18 @@ int main(int argc, char *argv[])
 	{
 		printf("Waiting for accept\n");
 		newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-
 		if (newsockfd < 0) error("ERROR on accept");
 		else printf("Accepted\n");
 
+		// Read incomming string, extract filename and size, then output these.
 		bzero(readBuf,sizeof(readBuf));
-		n = read(newsockfd,readBuf,sizeof(readBuf));
+		const char* buf = readTextTCP(readBuf, sizeof(readBuf), newsockfd);
+		long size = check_File_Exists((char*)buf);
+		printf("File Requested: %s, file length: %li \n",buf, size);
 
-		if (n < 0) error("ERROR reading from socket");
-		printf("Message: %s\n",readBuf);
-		
-		snprintf(writeBuf, sizeof(writeBuf), "Got message: %s",readBuf);
-
-		n = write(newsockfd,writeBuf,strlen(writeBuf));
-		if (n < 0) error("ERROR writing to socket");
-			
+		//return file:
+		sendFile(buf, size, newsockfd);
+		printf("File sent! \n");	
 		close(newsockfd);
 	}
 	close(sockfd);
@@ -91,8 +90,28 @@ int main(int argc, char *argv[])
  * @param fileSize Størrelsen på filen, 0 hvis den ikke findes
  * @param outToClient Stream som der skrives til socket
      */
-void sendFile(string fileName, long fileSize, int outToClient)
+void sendFile(const char* fileName, long fileSize, int outToClient)
 {
-    // TO DO Your own code
+	sprintf(writeBuf, "%li", fileSize);
+	writeTextTCP(outToClient,writeBuf);
+	bzero(writeBuf,sizeof(writeBuf));
+	if(fileSize > 0){
+		size_t j = ceil((double)fileSize / 1000);
+		FILE* fp;
+		fp = fopen(fileName, "rb");
+		if(fp != NULL){
+			for (size_t i = 0; i < j; i++)
+			{
+				fread(writeBuf,1,1000,fp);
+				writeTextTCP(outToClient,writeBuf);
+				printf("Sent bytes: %li to %li \n", i * 1000, (i+1)*1000);
+			}
+			
+		}
+	}
+	else{
+		printf("File is empty or does not exist on server.\n");
+	}
+	printf("All bytes Transmitted.\n");
 }
 
