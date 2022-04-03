@@ -2,7 +2,8 @@
 #define LIB_H
 
 #define PORT 9000
-#define BUFSIZE 1000
+#define BUFSIZETRANSMIT 1000
+#define BUFSIZEREAD 100
 
 #ifdef __cplusplus
     extern "C" {

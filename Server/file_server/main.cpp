@@ -14,6 +14,12 @@
 #include "iknlib.h"
 
 using namespace std;
+static int sockfd, newsockfd, n;
+static int portnum = PORT;
+static socklen_t clilen;
+static char readBuf[BUFSIZEREAD];
+static char writeBuf[BUFSIZETRANSMIT];
+struct sockaddr_in serv_addr, cli_addr;
 
 void sendFile(string fileName, long fileSize, int outToClient);
 
@@ -31,7 +37,51 @@ void sendFile(string fileName, long fileSize, int outToClient);
  */
 int main(int argc, char *argv[])
 {
-    // TO DO Your own code
+    printf("Starting Server\n");
+
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0){
+		error("ERROR opening socket");
+        return -1;
+    }
+    printf("Binding\n");
+
+	bzero((char *) &serv_addr, sizeof(serv_addr));
+    serv_addr.sin_family = AF_INET;
+	serv_addr.sin_addr.s_addr = INADDR_ANY;
+	serv_addr.sin_port = htons(portnum);
+
+    if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0){
+		error("ERROR on binding");
+        return -1;
+    }
+
+	printf("Listening\n");
+	listen(sockfd,5);
+
+    for (;;)
+	{
+		printf("Accept...\n");
+		newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
+
+		if (newsockfd < 0) error("ERROR on accept");
+		else printf("Accepted\n");
+
+		bzero(readBuf,sizeof(readBuf));
+		n = read(newsockfd,readBuf,sizeof(readBuf));
+
+		if (n < 0) error("ERROR reading from socket");
+		printf("Message: %s\n",readBuf);
+		
+		snprintf(writeBuf, sizeof(writeBuf), "Got message: %s",readBuf);
+
+		n = write(newsockfd,writeBuf,strlen(writeBuf));
+		if (n < 0) error("ERROR writing to socket");
+			
+		close(newsockfd);
+	}
+	close(sockfd);
+	return 0; 
 }
 
 /**
