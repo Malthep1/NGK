@@ -17,8 +17,8 @@ using namespace std;
 static int sockfd, newsockfd, n;
 static int portnum = PORT;
 static socklen_t clilen;
-static char readBuf[BUFSIZEREAD];
-static char writeBuf[BUFSIZETRANSMIT];
+static char readBuf[BUFSIZE];
+static char writeBuf[BUFSIZE];
 struct sockaddr_in serv_addr, cli_addr;
 
 void sendFile(string fileName, long fileSize, int outToClient);
@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
 
     for (;;)
 	{
-		printf("Accept...\n");
+		printf("Waiting for accept\n");
 		newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
 
 		if (newsockfd < 0) error("ERROR on accept");

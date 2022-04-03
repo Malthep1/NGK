@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 
 	for (;;)
 	{
-		printf("Accept...\n");
+		printf("Waiting for accept\n");
 		newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
 
 		if (newsockfd < 0) error("ERROR on accept");
