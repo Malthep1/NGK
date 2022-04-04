@@ -90,10 +90,19 @@ void receiveFile(char* fileName, int sockfd)
 		if(fp != NULL){
 			for (size_t i = 0; i < j; i++)
 			{
-				const char* buf = readTextTCP(readBuffer, sizeof(readBuffer), sockfd);
-				printf("Received: %s", (void *)buf);
-				fwrite((void *)buf, 1,sizeof(buf),fp);
-				printf("Wrote bytes: %li to %li, into %s \n", i * 1000, (i+1)*1000, extractedFilename);
+				if(i+1 != j){
+					const char* buf = readTextTCP(readBuffer, sizeof(readBuffer), sockfd);
+					fwrite((void *)buf, 1,sizeof(readBuffer),fp);
+					printf("Wrote bytes: %li to %li, into %s \n", i * 1000, (i+1)*1000, extractedFilename);
+				}
+				else {
+					int remainingBytes = filesize % 1000;
+					char remainingBuffer[remainingBytes];
+					const char* buf = readTextTCP(remainingBuffer, sizeof(remainingBuffer), sockfd);
+					fread(remainingBuffer,remainingBytes,1,fp);
+					fwrite((void *)buf, 1,sizeof(remainingBuffer),fp);
+					printf("Wrote bytes: %li to %li, into %s \n", i * 1000, (i*1000) + remainingBytes, extractedFilename);
+				}
 			}
 			
 		}
