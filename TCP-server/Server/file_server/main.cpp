@@ -100,11 +100,19 @@ void sendFile(const char* fileName, long fileSize, int outToClient)
 		FILE* fp;
 		fp = fopen(fileName, "rb");
 		if(fp != NULL){
-			for (size_t i = 0; i < j; i++)
-			{
-				fread(writeBuf,1,1000,fp);
-				writeTextTCP(outToClient,writeBuf);
-				printf("Sent bytes: %li to %li \n", i * 1000, (i+1)*1000);
+			for (size_t i = 0; i < j; i++){	
+				if(i+1 != j){
+					fread(writeBuf,1000,1,fp);
+					writeTextTCP(outToClient,writeBuf);
+					printf("Read and sent bytes: %li to %li, from %s \n", i * 1000, (i+1)*1000, fileName);
+				}
+				else {
+					int remainingBytes = fileSize % 1000;
+					char remainingBuffer[remainingBytes];
+					fread(remainingBuffer,remainingBytes,1,fp);
+					writeTextTCP(outToClient,remainingBuffer);
+					printf("Read and sent bytes: %li to %li, from %s \n", i * 1000, (i*1000) + remainingBytes, fileName);
+				}
 			}
 			
 		}
