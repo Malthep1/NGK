@@ -9,7 +9,7 @@
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}.exe", 
 				"${workspaceFolder}/*.c", 
-				//"${workspaceFolder}/*.cpp",
+				"${workspaceFolder}/*.cpp",
             ],
             "options": {
                 "cwd": "${fileDirname}"
